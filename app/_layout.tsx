@@ -44,17 +44,16 @@ export default function RootLayout() {
   return (
     <SafeAreaView className="flex-1">
       <View className="flex-1">
-        {/* ✅ Replace Stack with Drawer */}
         <Drawer
           drawerContent={CustomDrawerContent}
           screenOptions={{
             headerShown: false,
             drawerStyle: {
-              width: 280,
+              width: 300,
             },
             overlayColor: "rgba(0, 0, 0, 0.5)",
           }}
-        ></Drawer>
+        />
 
         <PortalHost />
       </View>
