@@ -1,5 +1,6 @@
 import CustomDrawerContent from "@/components/CustomDrawerContent";
 import CustomSplashScreen from "@/components/SplashScreen";
+import { AuthProvider } from "@/lib/auth";
 import {
   PlayfairDisplay_700Bold,
   useFonts,
@@ -42,21 +43,23 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaView className="flex-1">
-      <View className="flex-1">
-        <Drawer
-          drawerContent={CustomDrawerContent}
-          screenOptions={{
-            headerShown: false,
-            drawerStyle: {
-              width: 300,
-            },
-            overlayColor: "rgba(0, 0, 0, 0.5)",
-          }}
-        />
+    <AuthProvider>
+      <SafeAreaView className="flex-1">
+        <View className="flex-1">
+          <Drawer
+            drawerContent={CustomDrawerContent}
+            screenOptions={{
+              headerShown: false,
+              drawerStyle: {
+                width: 300,
+              },
+              overlayColor: "rgba(0, 0, 0, 0.5)",
+            }}
+          />
 
-        <PortalHost />
-      </View>
-    </SafeAreaView>
+          <PortalHost />
+        </View>
+      </SafeAreaView>
+    </AuthProvider>
   );
 }

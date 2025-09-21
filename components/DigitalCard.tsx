@@ -1,3 +1,4 @@
+import { useAuth } from "@/lib/auth";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   CircleCheckBig,
@@ -5,6 +6,7 @@ import {
   Globe,
   QrCode,
   ShieldCheck,
+  UserX,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
@@ -12,8 +14,64 @@ import QRCode from "react-native-qrcode-svg";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 const DigitalCard = () => {
+  const { user } = useAuth();
   const [showQR, setShowQR] = useState(false);
-  const hash = "ST-2024-001234|JohnDoe|USA";
+
+  // Generate QR code data based on user info
+  const generateQRData = () => {
+    if (!user) return "GUEST|NO_ID|NO_NATIONALITY";
+    return `${user.touristId}|${user.name}|${user.isDemoUser ? "DEMO" : "VERIFIED"}`;
+  };
+
+  const generateValidUntil = () => {
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1); // Valid for 1 year
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  // If no user, show guest card
+  if (!user) {
+    return (
+      <Card className="rounded-none border-none shadow-none py-4">
+        <CardHeader className="px-4">
+          <CardTitle>
+            <View className="flex-row items-center gap-3">
+              <LinearGradient
+                colors={["#64748b", "#475569"]}
+                style={{ padding: 12, borderRadius: 16 }}
+              >
+                <UserX color="white" size={20} />
+              </LinearGradient>
+              <View>
+                <Text className="text-lg font-bold text-slate-800">
+                  Guest Access
+                </Text>
+                <Text className="text-slate-500 text-xs">
+                  Please register for full features
+                </Text>
+              </View>
+            </View>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pt-0">
+          <LinearGradient
+            colors={["#64748b", "#475569"]}
+            style={{ padding: 24, borderRadius: 24 }}
+          >
+            <View className="items-center py-4">
+              <Text className="text-white text-center text-sm">
+                Complete registration to get your Digital Tourist ID
+              </Text>
+            </View>
+          </LinearGradient>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -33,7 +91,9 @@ const DigitalCard = () => {
                 </Text>
                 <View className="text-slate-500 text-xs flex items-center gap-0.5 flex-row">
                   <ShieldCheck size={16} />
-                  <Text>Blockchain secured</Text>
+                  <Text>
+                    {user.isDemoUser ? "Demo Mode" : "Blockchain secured"}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -72,7 +132,7 @@ const DigitalCard = () => {
                     <View className="flex items-center gap-1 flex-row">
                       <CircleCheckBig size={16} color="white" />
                       <Text className="text-white text-xs font-bold">
-                        VERIFIED
+                        {user.isDemoUser ? "DEMO" : "VERIFIED"}
                       </Text>
                     </View>
                   </LinearGradient>
@@ -97,18 +157,18 @@ const DigitalCard = () => {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    John Doe
+                    {user.name}
                   </Text>
                 </View>
 
                 <View className="min-w-[120px]">
-                  <Text className="text-xs text-white/70">Nationality</Text>
+                  <Text className="text-xs text-white/70">Status</Text>
                   <Text
                     className="font-bold text-white"
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    United States
+                    {user.isDemoUser ? "Demo User" : "Active Tourist"}
                   </Text>
                 </View>
 
@@ -119,7 +179,7 @@ const DigitalCard = () => {
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    Dec 31, 2024
+                    {generateValidUntil()}
                   </Text>
                 </View>
 
@@ -128,9 +188,9 @@ const DigitalCard = () => {
                   <Text
                     className="font-bold text-white"
                     numberOfLines={1}
-                    ellipsizeMode="middle" // 👈 middle truncation better for IDs
+                    ellipsizeMode="middle"
                   >
-                    ST-2024-001234
+                    {user.touristId}
                   </Text>
                 </View>
               </View>
@@ -188,7 +248,7 @@ const DigitalCard = () => {
               alignItems: "center",
             }}
           >
-            <QRCode value={hash} size={200} />
+            <QRCode value={generateQRData()} size={200} />
 
             <TouchableOpacity
               onPress={() => setShowQR(false)}
